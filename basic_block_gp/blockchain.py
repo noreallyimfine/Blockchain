@@ -31,11 +31,11 @@ class Blockchain(object):
         """
 
         block = {
-            'index': len(self.chain + 1),
+            'index': len(self.chain) + 1,
             'timestamp': time(),
             'transactions': self.current_transactions,
             'proof': proof,
-            'previous_hash': previous_hash or self.hash(self.chain[-1]) 
+            'previous_hash': previous_hash or self.hash(self.chain[-1])
         }
 
         # Reset the current list of transactions
@@ -53,8 +53,6 @@ class Blockchain(object):
         "return": <str>
         """
 
-        # Use json.dumps to convert json into a string
-        # Use hashlib.sha256 to create a hash
         # It requires a `bytes-like` object, which is what
         # .encode() does.
         # It converts the Python string into a byte string.
@@ -65,14 +63,18 @@ class Blockchain(object):
 
         # TODO: Hash this string using sha256
 
+        # Use json.dumps to convert json into a string
+        string_block = json.dumps(block, sort_keys=True)
+        # Use hashlib.sha256 to create a hash
+        raw_hash = hashlib.sha256(string_block.encode())
         # By itself, the sha256 function returns the hash in a raw string
         # that will likely include escaped characters.
         # This can be hard to read, but .hexdigest() converts the
         # hash to a string of hexadecimal characters, which is
         # easier to work with and understand
-
+        hex_hash = raw_hash.hexdigest()
         # TODO: Return the hashed block string in hexadecimal format
-        pass
+        return hex_hash
 
     @property
     def last_block(self):
@@ -134,7 +136,8 @@ def mine():
 def full_chain():
     response = {
         # TODO: Return the chain and its current length
-        "message": "goodbye"
+        "chain": blockchain.chain,
+        "length": len(blockchain.chain)
     }
     return jsonify(response), 200
 
