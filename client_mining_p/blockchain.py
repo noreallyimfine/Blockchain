@@ -90,7 +90,6 @@ class Blockchain(object):
     #         proof += 1
 
     #     return proof
-    #     
 
     @staticmethod
     def valid_proof(block_string, proof):
@@ -121,19 +120,38 @@ node_identifier = str(uuid4()).replace('-', '')
 blockchain = Blockchain()
 
 
-@app.route('/mine', methods=['GET'])
+@app.route('/mine', methods=['POST'])
 def mine():
-    # Run the proof of work algorithm to get the next proof
-    proof = blockchain.proof_of_work(blockchain.last_block)
-    # Forge the new Block by adding it to the chain with the proof
-    previous_hash = blockchain.hash(blockchain.last_block)
+    data = request.get_json()
+    if not data['proof'] or not data['id']:
+        response = {
+            'message': 'error-message'
+        }
+        return jsonify(response), 400
+    else:
+        block_string = json.dumps(blockchain.last_block)
+        proof = data['proof']
+        if blockchain.valid_proof(block_string, proof):
+            response = {
+                "message": "Success! You mined the next coin!"
+            }
+        else:
+            response = {
+                "message": "I'm sorry that's not the correct proof"
+            }
+        return jsonify(response), 200
 
-    block = blockchain.new_block(proof, previous_hash)
-    response = {
-        "new_block": block
-    }
+    # # Run the proof of work algorithm to get the next proof
+    # proof = blockchain.proof_of_work(blockchain.last_block)
+    # # Forge the new Block by adding it to the chain with the proof
+    # previous_hash = blockchain.hash(blockchain.last_block)
 
-    return jsonify(response), 200
+    # block = blockchain.new_block(proof, previous_hash)
+    # response = {
+    #     "new_block": block
+    # }
+
+    # return jsonify(response), 200
 
 
 @app.route('/chain', methods=['GET'])
