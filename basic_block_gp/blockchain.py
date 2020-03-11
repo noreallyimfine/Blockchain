@@ -83,7 +83,7 @@ class Blockchain(object):
         in an effort to find a number that is a valid proof
         :return: A valid proof for the provided block
         """
-        string_block = json.dumps(block, sort_keys=True)
+        block_string = json.dumps(block, sort_keys=True)
 
         proof = 0
         while self.valid_proof(block_string, proof) is False:
