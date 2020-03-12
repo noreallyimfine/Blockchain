@@ -75,21 +75,21 @@ class Blockchain(object):
     def last_block(self):
         return self.chain[-1]
 
-    # def proof_of_work(self, block):
-    #     """
-    #     Simple Proof of Work Algorithm
-    #     Stringify the block and look for a proof.
-    #     Loop through possibilities, checking each one against `valid_proof`
-    #     in an effort to find a number that is a valid proof
-    #     :return: A valid proof for the provided block
-    #     """
-    #     block_string = json.dumps(block, sort_keys=True)
+    def proof_of_work(self, block):
+        """
+        Simple Proof of Work Algorithm
+        Stringify the block and look for a proof.
+        Loop through possibilities, checking each one against `valid_proof`
+        in an effort to find a number that is a valid proof
+        :return: A valid proof for the provided block
+        """
+        block_string = json.dumps(block, sort_keys=True)
 
-    #     proof = 0
-    #     while self.valid_proof(block_string, proof) is False:
-    #         proof += 1
+        proof = 0
+        while self.valid_proof(block_string, proof) is False:
+            proof += 1
 
-    #     return proof
+        return proof
 
     @staticmethod
     def valid_proof(block_string, proof):
@@ -129,14 +129,18 @@ def mine():
         }
         return jsonify(response), 400
     else:
+        server_proof = blockchain.proof_of_work(blockchain.last_block)
         block_string = json.dumps(blockchain.last_block)
+        print(block_string)
         proof = data['proof']
-        if blockchain.valid_proof(block_string, proof):
+        if blockchain.valid_proof(block_string, proof) is True:
             response = {
-                "message": "Success! You mined the next coin!"
+                "last_block": blockchain.last_block,
+                "message": "Success! New Block forged!"
             }
         else:
             response = {
+                "correct_proof": server_proof,
                 "message": "I'm sorry that's not the correct proof"
             }
         return jsonify(response), 200
@@ -157,7 +161,6 @@ def mine():
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
-        # TODO: Return the chain and its current length
         "chain": blockchain.chain,
         "length": len(blockchain.chain)
     }

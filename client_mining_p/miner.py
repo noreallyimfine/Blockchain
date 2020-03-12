@@ -17,7 +17,7 @@ def proof_of_work(block):
 
     proof = 0
 
-    while not valid_proof(block_string, proof):
+    while valid_proof(block_string, proof) is False:
         proof += 1
 
     return proof
@@ -68,6 +68,7 @@ if __name__ == '__main__':
         print("Mining...")
         block = data['last_block']
         new_proof = proof_of_work(block)
+        print(block)
         print(new_proof)
         # When found, POST it to the server {"proof": new_proof, "id": id}
         post_data = {"proof": new_proof, "id": id}
